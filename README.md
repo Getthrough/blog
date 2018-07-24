@@ -9,7 +9,7 @@ It's a repository where I write something about programming.
 ### One: Consider static factory methods instead of constructors
 示例:
 ```
-    public Boolean valueOf(boolean b) {
+    public static Boolean valueOf(boolean b) {
         return b ? Boolean.TRUE : Boolean.FALSE;
     }
 ```
