@@ -162,6 +162,24 @@ public enum FileSystem {
 其实，对于枚举类，使用反射创建对象是会报“枚举类无法实例化的异常”，也就是说，枚举类的单例既保证了序列化时单例也保证了使用反射时的单例。
 “使用枚举类创建单例是最好的方式”，Joshua Bloch 说到。
 ### four: Enforce noninstantiability with a private constructor
+对于一些工具类而言，它所拥有的都是静态方法和字段，比如 java.lang.Math, java.util.Arrays，这些工具类在使用时并不希望使用者去创建实例。对于一个类，如果不去手动编写它的构造方法，那么编译器会提供一个无参的构造用于类的初始化。那如何防止调用者创建该类的实例呢？将该类设计成抽象类吗？不是。抽象类的一大用意是让子类继承，而子类在正常情况下是可以被实例化的。既然在不手动提供构造器时，编译器会提供默认无参构造器，那么我们手动提供一个**私有的构造器**就可以了。
+```
+// Noninstantiable utility class
+public class UtilityClass {
+    // 私有构造，为了防止在该类中无意调用了构造，可抛出异常提示（并不是严格要求需要）
+    // 最好写上注释，指出私有属性
+    private UtilityClass() {
+    throw new AssertionError();
+    }
+}
+```
+### five: Avoid creating unnecessary objects
+避免创建不必要的对象。
+书上一个例子：
+```
+String s = new String("stringette");// Don't do this!
+```
+这是非常不明智的做法，因为"stringette"本身就是一个字符串，它存在于方法区的常量池。
 
 
 
