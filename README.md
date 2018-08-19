@@ -188,11 +188,45 @@ String s = new String("stringette");// Don't do this!
 删除“过期”的对象引用。(过期引用：再也不会被取消引用的引用)
 书中举了一个栈（Stack）的模型结构：
 ```
-// TODO code need to be copied
+// Can you spot the "memory leak"?
+public class Stack {
+    private Object[] elements;
+    private int size = 0;
+    private static final int DEFAULT_INITIAL_CAPACITY = 16;
+    public Stack() {
+        elements = new Object[DEFAULT_INITIAL_CAPACITY];
+    }
+    public void push(Object e) {
+        ensureCapacity();
+        elements[size++] = e;
+    }
+    public Object pop() {
+        if (size == 0)
+        throw new EmptyStackException();
+        return elements[--size];
+    }
+    /**
+    * Ensure space for at least one more element, roughly
+    * doubling the capacity each time the array needs to grow.
+    */
+    private void ensureCapacity() {
+        if (elements.length == size)
+        elements = Arrays.copyOf(elements, 2 * size + 1);
+    }
+}
 ```
 pop() 方法将栈顶的元素获取后指针往后退一位，此时 pop 出来的对象存在着过期的引用无法被垃圾回收期回收。当元素不断的进栈出栈，愈来愈多的过期对象可能会造成内存溢出（out of memory OOM）的风险。
 
 `elements[size] = null;` 将数组栈顶位置指向 null 即可消除过期引用了。
+在使用缓存时，也比较容易发生内存泄漏。将对象引用放入缓存中，它就容易被遗忘掉，导致在很长的一段时间里它不被使用但也仍然存在与缓存中。如果想要实现一种这样的缓存：在缓存之外有指向缓存键值对中的键，那么该键值对就不会失效。那么可以使用 `WeakHashMap` 实现。
+
+如果一个客户端在一个 API 中注册了回调，但是没有显式地取消注册，那么很有可能它们会积聚起来。想要确保它们被垃圾回收，最好保存它们地弱引用，如保存成 `WeakHashMap` 中地键。
+
+### Item 7 Avoid finalizers
+
+
+### Item 8 Obey the genernal contract when  overriding **equals**
+
 
 
 
